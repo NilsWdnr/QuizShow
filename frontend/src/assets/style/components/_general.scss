@@ -1,0 +1,52 @@
+@import "../variables.scss";
+
+a {
+    text-decoration: none;
+    color: white;
+
+    &:hover{
+        color: white;
+    }
+}
+
+
+body {
+margin: 0;
+padding: 0;
+background-color: #1C1C1C;
+color: white;
+font-family: 'Raleway', sans-serif;
+font-size: 12px;
+
+@media screen and (min-width: 768px) { 
+    font-size: 16px;
+}
+
+}
+
+a {
+    color: inherit;
+    &:hover {
+        color: inherit;
+    }
+}
+
+#leaderboard .personal-highscore {
+    font-size: 1.5em;
+  }
+  
+  #leaderboard .rank {
+    font-size: 2em;
+  }
+
+.container-style-primary {
+    background-color: rgba(0,0,0,0.4);
+    border: solid $purple 3px;
+    border-radius: 10px;
+}  
+
+
+
+
+  
+  

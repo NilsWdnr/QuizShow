@@ -1,0 +1,17 @@
+.ingame, .login , .register {
+    header {
+        position: fixed;
+    }
+}
+
+header {
+    position: sticky;
+}
+  
+#header-ingame {
+    position: fixed;
+}
+  
+#logo-quizshow {
+    max-width: 100%;
+}
