@@ -1,0 +1,58 @@
+.login, .register, .ingame, .profileSelf {
+    footer {
+      display: none;
+    }
+  }
+
+footer {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 0px 40px 0px 0px;
+    background-color: #E9E9E9;
+    position: fixed;
+    bottom: 0;
+    color: black;
+
+    .footer-main {
+        display: flex;
+        align-items: center;
+        height: 70px;
+        justify-content: space-between;
+    }
+
+    .player-img {
+        margin-left: 10px;
+        width: 60px;
+        height: 60px;
+        background-color: black;
+        position: relative;
+    }
+
+    .player-info {
+        margin-left: 10px;
+        height: 60px;
+    }
+
+    .player-name {
+        font-size: 1.5em;
+        margin: 0;
+    }
+}
+  
+  /*
+
+  .player-level-alt {
+    background-color: #8D188D;
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.6em;
+  }
+
+  */
+  

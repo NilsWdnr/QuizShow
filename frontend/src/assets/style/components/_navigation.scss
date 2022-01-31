@@ -1,0 +1,69 @@
+.login-page, .register-page, .ingame-page, .profileSelf-page {
+  nav {
+    display: none;
+  }
+}
+
+
+.home-page {
+  .nav-link-home {
+    border-bottom: white 5px solid;
+  }
+}
+
+.friends-page {
+  .nav-link-friends {
+    border-bottom: white 5px solid;
+  }
+}
+
+.leaderboard-page {
+  .nav-link-leaderboard {
+    border-bottom: white 5px solid;
+  }
+}
+
+nav a  {
+  border-bottom: rgba(255, 255, 255, 0.0) 5px solid;
+  width: 25%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+
+  &:hover {
+      border-bottom: rgba(255, 255, 255, 0.2) 5px solid;
+  }
+
+  span {
+      margin-left: 10px;
+  }
+} 
+
+.nav-icon {
+  color: white;
+  width: 30px;
+  height: 30px;
+  /* margin-right: 10px; */
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.nav-icon-home {
+  background-image: url(../../img/nav/home-svgrepo-com.svg);
+}
+
+.nav-icon-friends {
+  background-image: url(../../img/nav/group-filled-persons-svgrepo-com.svg);
+}
+
+.nav-icon-leaderboard {
+  background-image: url(../../img/nav/cup-svgrepo-com.svg);
+}
+
+.nav-icon-settings {
+  background-image: url(../../img/nav/settings-svgrepo-com.svg);
+}
+  

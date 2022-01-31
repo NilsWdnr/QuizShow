@@ -1,0 +1,17 @@
+.ingame-page, .login-page , .register-page {
+    header {
+        position: absolute;
+    }
+}
+
+header {
+    position: inherit;
+}
+  
+#header-ingame {
+    position: fixed;
+}
+  
+#logo-quizshow {
+    max-width: 100%;
+}
