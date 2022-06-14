@@ -1,11 +1,13 @@
 import React, { useState, useContext } from "react";
 import { Link, Navigate } from "react-router-dom";
 
+import postService from "../services/postService";
+import User from "../mapping/User";
+
 import { UserContext } from "../context/UserProvider";
 
-export default function Login (){
 
-    const { REACT_APP_BACKEND_URL } = process.env;
+export default function Login (){
 
     const {userState, setUser} = useContext(UserContext);
 
@@ -40,31 +42,19 @@ export default function Login (){
 
     const login = async (data) => {
 
-        const rawResponse = await fetch(`${REACT_APP_BACKEND_URL}/user/login`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        const response = await rawResponse.json();
-
-        console.log(response);
+        const response = await postService("user","login",data);
 
         if(response["success"]===true){
 
+            const user = new User(response.user);
+
             const userData = {
                 loggedIn: true,
-                id: response["id"],
-                username: username,
-                isLoading: false
+                isLoading: false,
+                ...user
               };
 
-            localStorage.setItem("loggedIn",true);
-            localStorage.setItem("id",response["id"]);
-            localStorage.setItem("username",username);
-        
+            localStorage.setItem("token",response.token);
             setUser(userData);
         
         } else {
@@ -110,9 +100,9 @@ export default function Login (){
     } else {
 
         return(
-            <div className="container-fluid px-3 quiz-wrapper">
+            <div className="container-fluid pt-5 px-3 register-wrapper">
                 <div className="row justify-content-center">
-                    <div className="py-3 px-5 col-10 col-lg-6 container-style-primary">
+                    <div className="py-3 px-3 px-sm-5 my-5 col-10 col-lg-6 container-style-primary">
                         <h2>Wilkommen</h2>
                         <h3>Um mit dem Spielen loszulegen musst du dich zunächst anmelden</h3>
                         <form className="my-4" onSubmit={handleSubmit}>

@@ -3,14 +3,15 @@ import { BrowserRouter } from 'react-router-dom';
 import Router from './Router';
 
 import Page from "./Page";
+import Loading from "./components/Loading";
 import Header from './components/Header';
 import Footer from './components/Footer';
 
-import { UserProvider, UserContext } from './context/UserProvider';
+import { UserContext } from './context/UserProvider';
 
 function App() {
 
-  const {userState,setUser} = useContext(UserContext);
+  const {userState} = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +25,7 @@ function App() {
     <>
       <BrowserRouter>
           <Page>
-            {loading ? <h1>Loading...</h1> : <><Header />
+            {loading ? <Loading /> : <><Header />
                 <Router/>
             <Footer />
             </>}

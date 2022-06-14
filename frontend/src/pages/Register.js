@@ -1,11 +1,12 @@
 import React, { useState, useContext } from "react";
 import { Link, Navigate } from "react-router-dom";
 
+import postService from "../services/postService";
+import User from "../mapping/User";
+
 import { UserContext } from "../context/UserProvider";
 
 export default function Register (){
-
-    const { REACT_APP_BACKEND_URL } = process.env;
 
     const {userState, setUser} = useContext(UserContext); 
 
@@ -22,15 +23,23 @@ export default function Register (){
     const handleChange = (e) => {
         const inputField = e.target.id;
         const input = e.target.value;
-        if(inputField==="username"){
-            setUsername(input);
-        } else if(inputField==="email"){
-            setEmail(input);
-        } else if(inputField==="password-repeat") {
-            setPasswordRepeat(input);
-        } else {
-            setPassword(input);
-        }
+
+        switch(inputField){
+            case "username":
+                setUsername(input);
+                break;   
+            case "email":
+                setEmail(input);
+                break; 
+            case "password":
+                setPassword(input);
+                break;    
+            case "passwordRepeat":
+                setPasswordRepeat(input);
+                break;
+            default:
+                break;                                         
+          }
         
     }
 
@@ -49,28 +58,19 @@ export default function Register (){
 
     const register = async (data) => {
 
-        const rawResponse = await fetch(`${REACT_APP_BACKEND_URL}/user/register`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        const response = await rawResponse.json();
+        const response = await postService("user","register",data);
 
         if(response["success"]===true){
+
+            const user = new User(response.user);
             
             const userData = {
                 loggedIn: true,
-                id: response["id"],
-                username: username,
-                isLoading: false
+                isLoading: false,
+                ...user
               };
 
-            localStorage.setItem("loggedIn",true);
-            localStorage.setItem("id",response["id"]);
-            localStorage.setItem("username",username);      
+            localStorage.setItem("token",response.token);
         
             setUser(userData);
 
@@ -119,33 +119,33 @@ export default function Register (){
     } else {
 
         return(
-            <div className="container-fluid px-3 quiz-wrapper">
+            <div className="container-fluid pt-5 px-3 register-wrapper">
                 <div className="row justify-content-center">
-                    <div className="py-3 px-5 col-10 col-lg-6 container-style-primary">
+                    <div className="py-3 px-3 px-sm-5 my-5 col-11 col-lg-6 container-style-primary">
                         <h2>Wilkommen</h2>
                         <h3>Erstelle dir zunächst ein Konto, um mit dem Spielen anzufangen</h3>
                         <form className="my-4" onSubmit={handleSubmit} noValidate>
                             <div className="form-group">
                                 <label htmlFor="username">Benutzername</label>
-                                <input type="text" className="form-control mb-3" id="username" placeholder="Benutzername" value={username} onChange={handleChange} />
+                                <input type="text" className="form-control mb-3" id="username" value={username} onChange={handleChange} />
                                 <ErrorMessage field="username"/>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="email">Email-Adresse</label>
-                                <input type="email" className="form-control mb-3" id="email" placeholder="Email" value={email} onChange={handleChange} />
+                                <input type="email" className="form-control mb-3" id="email" value={email} onChange={handleChange} />
                                 <ErrorMessage field="email"/>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="password">Passwort</label>
-                                <input type="password" className="form-control mb-3" id="password" placeholder="Passwort" value={password} onChange={handleChange}/>
+                                <input type="password" className="form-control mb-3" id="password" value={password} onChange={handleChange}/>
                                 <ErrorMessage field="password"/>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="password-repeat">Passwort wiederholen</label>
-                                <input type="password" className="form-control mb-3" id="password-repeat" placeholder="Passwort wiederholen" value={passwordRepeat} onChange={handleChange}/>
+                                <input type="password" className="form-control mb-3" id="passwordRepeat" value={passwordRepeat} onChange={handleChange}/>
                                 <ErrorMessage field="passwordRepeat"/>
                             </div>
-                            <button type="submit" className="btn btn-primary">Anmelden</button>
+                            <button type="submit" className="btn btn-primary">Registrieren</button>
                         </form>
                         <Link to="/login">Du hast bereits ein Konto? Jetzt anmelden</Link>
                     </div>

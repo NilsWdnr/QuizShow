@@ -1,19 +1,26 @@
-import React, { useState, useEffect, useRef } from "react";
-import {lowerFirst, range} from "lodash";
+import React, { useContext, useState, useEffect, useRef } from "react";
+import { range } from "lodash";
+
+import getService from "../services/getService";
+import postService from "../services/postService";
+
+import { UserContext } from "../context/UserProvider";
 
 import GameOver from "../components/GameOver";
 
 
 export default function InGame (){
 
-    const { REACT_APP_BACKEND_URL } = process.env;
+    const { userState } = useContext(UserContext);
+    const userID = userState.id;
 
     const [highscore, setHighscore] = useState(0);
     const [question, setQuestion] = useState("");
     const [score, setScore] = useState(0);
     const [hearts, setHearts] = useState(5);
     const [usedQuestions, setUsedQuestions] = useState([]);
-    const [timer, setTimer] = useState(null);
+    const [timerState, setTimerState] = useState(null);
+    const [gameOver, setGameOver] = useState(false);
     
     const answersContainer = useRef(null);
     const answerButton1 = useRef(null);
@@ -23,7 +30,7 @@ export default function InGame (){
     const nextQuestionButton = useRef(null);
     const timeBar = useRef(null);
 
-    let timeLeft;
+    let interval;
 
     const answerButtons = [answerButton1,answerButton2,answerButton3,answerButton4];
 
@@ -31,57 +38,79 @@ export default function InGame (){
 
         getHighscore();
         setUpQuestion();
-    }, [])
 
-    const setUpQuestion = () => {
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+
+
+    useEffect(() => {
+
+        if (timerState==="running"){
+            let timeLeft = 100.00;
+
+            interval = setInterval(()=>{ // eslint-disable-line react-hooks/exhaustive-deps
+                timeLeft = timeLeft - 1;
+                timeBar.current.style.width = timeLeft + "%";
+                if(timeLeft===0){
+                    clearInterval(interval);
+                    setTimerState("over");
+                }
+            },100)
+        } else if(timerState==="over"){
+            clearInterval(interval);
+            checkAnswer();
+        } else if(timerState==="stopped"){
+            clearInterval(interval);
+        }
+
+        return () => {
+            clearInterval(interval);
+        }
+
+    }, [timerState])
+
+
+
+    const setUpQuestion = async() => {
 
         answersContainer.current.style.pointerEvents = "all";
-
-
-        fetch(`${REACT_APP_BACKEND_URL}/question/randomQuestion`)
-        .then(data=>data.json())
-        .then(json=>checkQuestion(json))
 
         answerButtons.forEach((e)=>{
             e.current.style.backgroundColor = "#8D188D";
         })
+       
+        const data = {
+            usedQuestions
+        }
 
-    }
+        const response = await postService("question","randomQuestion",data); 
 
-    const startTimer = () => {
+        // Spiel beenden, falls alle Fragen aus der Datenbank aufgebraucht wurden
 
-        timeLeft = 100.00;
+        if(response.length===0){
+            setGameOver(true);
+            return;
+        }
 
-        const interval = setInterval(()=>{
-            timeLeft = timeLeft - 1;
-            timeBar.current.style.width = timeLeft + "%";
-            if(timeLeft===0){
-                clearInterval(interval);
-                checkAnswer(null);
-            }
-        },100)
+        setUsedQuestions ([...usedQuestions,response.id]);
 
-        setTimer(interval);
+        setQuestion(response);
+        setTimerState("running");
+
     }
 
     const getHighscore = () => {
 
-        const userID = sessionStorage.userID;
-
-        fetch(`${REACT_APP_BACKEND_URL}/user/getHighscore/${userID}`)
-        .then(data=>data.json())
-        .then(json=>setHighscore(json));
+        getService("user","getHighscore",userID)
+            .then(res=>setHighscore(res));
 
     }
 
-    const checkAnswer = (e) => {
+    const checkAnswer = (e = null) => {
 
-        resetTimer();
+        setTimerState("stopped");
 
         answersContainer.current.style.pointerEvents = "none";
-
-        const newUsedQuestions = [...usedQuestions,question.id];
-        setUsedQuestions(newUsedQuestions);
 
         const correctAnswer = question.KorrekteAntwort;
 
@@ -92,7 +121,7 @@ export default function InGame (){
             
             if(innerText===correctAnswer){
                 clickedButton.style.backgroundColor = "green";
-                setScore(score+100)
+                setScore(score+(question.Schwierigkeitsstufe * 100));
             } else {
                 clickedButton.style.backgroundColor = "red";
     
@@ -120,35 +149,14 @@ export default function InGame (){
         toggleButton();
     } 
 
-    const checkQuestion = (newQuestion) => {
-        const newQuestionID = newQuestion.id;
-        let questionUsed = false;
-
-        if(usedQuestions.length===0){
-            setQuestion(newQuestion);
-            startTimer();
-        } else {
-
-            usedQuestions.forEach((usedQuestionID)=>{
-                if(newQuestionID===usedQuestionID){
-                    questionUsed = true;
-                }
-            })
-
-            if(questionUsed===false){
-                setQuestion(newQuestion);
-                startTimer();
-            } else {
-                setUpQuestion();
-            }    
-
-        }
-
-    }
-
     const nextQuestion = () => {
-        toggleButton();
-        setUpQuestion();
+        if(hearts===0){
+            setGameOver(true);
+        } else {
+            toggleButton();
+            setUpQuestion();
+        }    
+
     }
 
     const toggleButton = () => {
@@ -165,16 +173,13 @@ export default function InGame (){
         })}</div>;
     }
     
-    function resetTimer() {
-        clearInterval(timer);
-    }
 
-    if(hearts>0){
+    if(!gameOver){
         return(
             <>
-                <div id="score-container"className="col-12 pt-2 col-sm-auto">
+                <div id="score-container"className="col-12 pt-2 col-sm-auto m-0 ps-3">
                     <p className="m-0">Highscore: <span className="" id="personal-highscore">{highscore}</span></p>
-                    <p>Score: <span id="score">{score}</span></p>
+                    <p className="mb-0">Score: <span id="score">{score}</span></p>
                     <HeartIcons />
                 </div>
 
@@ -211,7 +216,7 @@ export default function InGame (){
                                     </div>
                                 </div>
                                 <div className="row justify-content-center mt-3">
-                                    <button id="nextQuestionButton" onClick={nextQuestion} ref={nextQuestionButton} className="col-8 py-3">Nächste Frage</button>
+                                    <button id="nextQuestionButton" onClick={nextQuestion} ref={nextQuestionButton} className="col-8 py-3">{ hearts > 0 ? "Nächste Frage" : "Zur Auswerung" }</button>
                                 </div>
                             </div>
                         </div>

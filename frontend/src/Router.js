@@ -1,40 +1,35 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Navigate, Routes, Route } from 'react-router-dom';
 
-import Root from './RouteGuards/Root';
-import Home from './pages/Home';
+import Root from './routeGuards/Root';
 import Friends from './pages/Friends'
 import Leaderboard from './pages/Leaderboard';
+import Settings from './pages/Settings';
 import InGame from './pages/InGame';
 import Login from './pages/Login';
-import ProfileSelf from './pages/ProfileSelf';
 import Register from './pages/Register';
 import Logout from './pages/Logout';
-import TimerTest from './pages/TimerTest';
+import UserProfile from './pages/UserProfile';
+import Restart from './pages/Restart';
 
-import GuestsOnlyRoutes from './RouteGuards/GuestsOnlyRoutes';
-import LoggedInOnlyRoutes from './RouteGuards/LoggedInOnlyRoutes';
-
-import { UserContext } from './context/UserProvider';
+import GuestsOnlyRoutes from './routeGuards/GuestsOnlyRoutes';
+import LoggedInOnlyRoutes from './routeGuards/LoggedInOnlyRoutes';
 
 
 export default function Router(){
-
-    const { userState, setUser } = useContext(UserContext);
-
-    console.log({Message: "Rendered component in router", Data: userState});
 
     return( 
         <Routes>
             <Route path="/" element={<Root />} />
             
             <Route element={<LoggedInOnlyRoutes />}>
-                <Route path="/timerTest" element={<TimerTest />} />
                 <Route path="/friends" element={<Friends />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/settings" element={<Settings />} />
                 <Route path="/ingame" element={<InGame />} />              
-                <Route path="/profileSelf" element={<ProfileSelf />}/>
                 <Route path="/logout" element={<Logout />} />
+                <Route path="/user/:username" element={<UserProfile />} /> 
+                <Route path="/restart" element={<Restart />} />
                 <Route path="*" element={<Navigate replace to="/" />} />
             </Route>
 
